@@ -1,0 +1,13 @@
+{
+  "name": "guardpro",
+  "version": "0.1.0",
+  "description": "Guard Pro — guard scheduling, clock-in and dispatch for New England Security",
+  "private": true,
+  "type": "commonjs",
+  "engines": { "node": ">=22.5" },
+  "scripts": {
+    "start": "node server/index.js",
+    "import": "node server/import-tracktik.js",
+    "reset": "node server/import-tracktik.js --reset"
+  }
+}

@@ -1,0 +1,13 @@
+{
+  "name": "Guard Pro",
+  "short_name": "Guard Pro",
+  "description": "Your shifts, clock in and post orders from New England Security dispatch.",
+  "start_url": "/officer/",
+  "scope": "/officer/",
+  "display": "standalone",
+  "background_color": "#0A1F44",
+  "theme_color": "#0A1F44",
+  "icons": [
+    { "src": "icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable" }
+  ]
+}

@@ -1,0 +1,153 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0A1F44">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Guard Pro">
+<title>Guard Pro</title>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&family=Barlow:wght@400;500;600&display=swap">
+<style>
+:root{--navy:#0A1F44;--gold:#C9A227;--bg:#F3F4F7;--surface:#fff;--surface-2:#EBEEF4;--line:#D8DCE6;--text:#131C33;--muted:#5D6780;--ok:#2C7A5B;--ok-bg:#E3F2EA;--warn:#A86D0E;--warn-bg:#FBF1DC;--bad:#B3261E;--bad-bg:#FBE9E7;--info:#2B5FAF;--info-bg:#E4ECFA}
+@media (prefers-color-scheme:dark){:root{--bg:#0D1526;--surface:#142038;--surface-2:#1B2A48;--line:#26324D;--text:#E8ECF4;--muted:#9AA6BF;--ok:#7FD3AE;--ok-bg:#15352A;--warn:#E6B45A;--warn-bg:#3A2E14;--bad:#F28B82;--bad-bg:#3A1E1C;--info:#8FB4F0;--info-bg:#1A2B4D}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font-family:Barlow,system-ui,sans-serif;font-size:16px;line-height:1.4;-webkit-font-smoothing:antialiased}
+.top{background:var(--navy);color:#fff;padding:calc(env(safe-area-inset-top) + 12px) 16px 12px;display:flex;align-items:center;gap:12px;position:sticky;top:0;z-index:5}
+.brand{font-family:"Barlow Condensed",sans-serif;font-weight:700;font-size:22px;letter-spacing:.06em;text-transform:uppercase}.brand b{color:var(--gold)}
+.top .who{margin-left:auto;font-size:13px;opacity:.85;text-align:right;line-height:1.2}
+.top .who button{background:none;border:0;color:#fff;text-decoration:underline;font-size:12px;padding:0}
+main{padding:12px 12px calc(env(safe-area-inset-bottom) + 24px);max-width:560px;margin:0 auto}
+h2{font-family:"Barlow Condensed",sans-serif;font-size:18px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin:16px 4px 6px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:14px;margin-bottom:10px;box-shadow:0 1px 2px rgba(10,31,68,.06)}
+.card.now{border-color:var(--gold);box-shadow:0 0 0 2px var(--gold)}
+.card .site{font-family:"Barlow Condensed",sans-serif;font-weight:700;font-size:21px;line-height:1.1}
+.card .post{color:var(--muted);margin-top:2px}
+.card .time{font-size:22px;font-weight:600;font-variant-numeric:tabular-nums;margin:8px 0 2px}
+.card .meta{font-size:13px;color:var(--muted)}
+.pill{display:inline-block;font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;padding:3px 8px;border-radius:999px;background:var(--surface-2);color:var(--muted);margin-right:4px}
+.pill.ok{background:var(--ok-bg);color:var(--ok)}.pill.warn{background:var(--warn-bg);color:var(--warn)}.pill.bad{background:var(--bad-bg);color:var(--bad)}.pill.info{background:var(--info-bg);color:var(--info)}
+.btns{display:flex;gap:8px;margin-top:12px;flex-wrap:wrap}
+.btn{flex:1;min-width:120px;border:1px solid var(--line);background:var(--surface);color:var(--text);border-radius:10px;padding:14px 12px;font:inherit;font-weight:600;font-size:16px}
+.btn.primary{background:var(--navy);border-color:var(--navy);color:#fff}
+.btn.gold{background:var(--gold);border-color:var(--gold);color:#1a1400}
+.btn:disabled{opacity:.5}
+.btn.small{flex:0;min-width:0;padding:8px 12px;font-size:14px;font-weight:500}
+details{margin-top:10px}summary{cursor:pointer;color:var(--info);font-weight:500}
+.orders{white-space:pre-wrap;background:var(--surface-2);border-radius:8px;padding:10px;margin-top:8px;font-size:15px}
+.msg{padding:10px 12px;border-radius:8px;font-size:14px;margin:8px 0}
+.msg.ok{background:var(--ok-bg);color:var(--ok)}.msg.bad{background:var(--bad-bg);color:var(--bad)}.msg.info{background:var(--info-bg);color:var(--info)}
+.login{max-width:420px;margin:40px auto;padding:0 16px}
+.login h1{font-family:"Barlow Condensed",sans-serif;font-size:30px;margin:0 0 4px}
+.login p{color:var(--muted);margin:0 0 16px}
+.field{display:flex;flex-direction:column;gap:6px;margin-bottom:12px}
+.field label{font-size:13px;color:var(--muted)}
+.field input{font:inherit;font-size:20px;padding:12px;border:1px solid var(--line);border-radius:10px;background:var(--surface);color:var(--text);letter-spacing:.04em}
+.empty{text-align:center;color:var(--muted);padding:40px 12px}
+.day{font-family:"Barlow Condensed",sans-serif;font-size:17px;letter-spacing:.04em;text-transform:uppercase;color:var(--muted);margin:18px 4px 6px}
+.day.today{color:var(--text)}
+.toast{position:fixed;left:50%;bottom:calc(env(safe-area-inset-bottom) + 20px);transform:translateX(-50%);background:var(--navy);color:#fff;padding:10px 16px;border-radius:8px;opacity:0;transition:opacity .2s;pointer-events:none;max-width:90vw;z-index:9}
+.toast.show{opacity:1}
+</style>
+</head>
+<body>
+<header class="top"><div class="brand">Guard <b>Pro</b></div><div class="who" id="who"></div></header>
+<main id="main"><div class="empty">Loading…</div></main>
+<div class="toast" id="toast"></div>
+<script>
+const $=s=>document.querySelector(s);
+const pad=n=>String(n).padStart(2,'0');
+const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const DAY=['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'],MON=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+const parseLocal=s=>{const [d,t='00:00']=s.split('T');const [y,m,da]=d.split('-').map(Number);const [h,mi]=t.split(':').map(Number);return new Date(y,m-1,da,h,mi);};
+const t12=s=>{const [h,mi]=s.slice(11,16).split(':').map(Number);return (h%12||12)+':'+pad(mi)+(h<12?'am':'pm');};
+const todayStr=()=>{const d=new Date();return d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate());};
+function toast(m){const t=$('#toast');t.textContent=m;t.classList.add('show');clearTimeout(t._h);t._h=setTimeout(()=>t.classList.remove('show'),3000);}
+async function api(method,path,body){const r=await fetch(path,{method,credentials:'same-origin',headers:{'content-type':'application/json'},body:body?JSON.stringify(body):undefined});const j=await r.json().catch(()=>({}));if(!r.ok)throw new Error(j.error||r.statusText);return j;}
+const S={user:null,data:null,phone:''};
+
+async function start(){
+  try{const me=await api('GET','/api/me');S.user=me.user;}catch(e){S.user=null;}
+  if(!S.user)return renderLogin();
+  if(S.user.role!=='officer'){location.href='/dispatch/';return;}
+  await load();
+  setInterval(load,60000);
+}
+async function load(){try{S.data=await api('GET','/api/officer/shifts');render();}catch(e){if(/Sign in/.test(e.message)){S.user=null;renderLogin();}else toast(e.message);}}
+
+function renderLogin(step){
+  $('#who').innerHTML='';
+  $('#main').innerHTML=`<div class="login"><h1>Officer sign in</h1><p>${step==='code'?'We sent a 6-digit code to '+esc(S.phone)+'.':'Use the mobile number dispatch has on file for you.'}</p>
+  <form id="lf">${step==='code'?`<div class="field"><label>Code</label><input name="code" inputmode="numeric" autocomplete="one-time-code" pattern="[0-9]{6}" maxlength="6" required autofocus></div>`:`<div class="field"><label>Mobile number</label><input name="phone" type="tel" inputmode="tel" autocomplete="tel" placeholder="617-555-0100" required autofocus></div>`}
+  <div class="msg bad" id="lmsg" hidden></div>
+  <button class="btn primary" type="submit" style="width:100%">${step==='code'?'Sign in':'Text me a code'}</button>
+  ${step==='code'?'<div style="text-align:center;margin-top:10px"><button type="button" class="btn small" id="back">Use a different number</button></div>':''}</form></div>`;
+  $('#lf').addEventListener('submit',async e=>{e.preventDefault();const f=e.target;const m=$('#lmsg');m.hidden=true;
+    try{
+      if(step==='code'){await api('POST','/api/auth/verify',{phone:S.phone,code:f.code.value.trim()});await start();}
+      else{S.phone=f.phone.value.trim();const r=await api('POST','/api/auth/request-code',{phone:S.phone});renderLogin('code');if(r.devCode){const m2=document.createElement('div');m2.className='msg info';m2.textContent='Texting is not set up yet on this server. Your code is '+r.devCode;$('#lf').prepend(m2);}}
+    }catch(err){m.textContent=err.message;m.hidden=false;}
+  });
+  const b=$('#back');if(b)b.onclick=()=>renderLogin();
+}
+
+function shiftState(sh,now){
+  if(sh.clock.out)return ['done','Done'];
+  if(sh.clock.in)return ['ok','On post'];
+  if(sh.s<=now&&sh.e>now)return ['bad','Not clocked in'];
+  if(sh.e<=now)return ['bad','Missed'];
+  return sh.ack?['ok','Acknowledged']:['warn','Please acknowledge'];
+}
+function render(){
+  const d=S.data;const now=d.now;const today=todayStr();
+  $('#who').innerHTML=`<div>${esc(d.employee.name)}</div><button id="out">Sign out</button>`;
+  $('#out').onclick=async()=>{await api('POST','/api/auth/logout');location.reload();};
+  const soon=new Date(Date.now()+90*60000);
+  const groups=new Map();for(const sh of d.shifts){const k=sh.s.slice(0,10);(groups.get(k)||groups.set(k,[]).get(k)).push(sh);}
+  let html='';
+  if(!d.shifts.length)html='<div class="empty">No published shifts in the next two weeks.<br>Call dispatch if that looks wrong.</div>';
+  for(const [day,list] of groups){
+    const dt=parseLocal(day);
+    html+=`<div class="day ${day===today?'today':''}">${day===today?'Today':day===addDays(today,1)?'Tomorrow':DAY[dt.getDay()]} · ${MON[dt.getMonth()]} ${dt.getDate()}</div>`;
+    for(const sh of list){
+      const [cls,txt]=shiftState(sh,now);
+      const active=!sh.clock.out&&(sh.clock.in||(sh.s<=now&&sh.e>now)||(parseLocal(sh.s)<=soon&&sh.e>now));
+      const canIn=!sh.clock.in&&parseLocal(sh.s)<=soon&&sh.e>now;
+      const canOut=sh.clock.in&&!sh.clock.out;
+      html+=`<div class="card ${active?'now':''}">
+        <div><span class="pill ${cls}">${txt}</span>${sh.pos.armed?'<span class="pill warn">Armed</span>':''}${sh.clock.in&&sh.clock.in.flagged?'<span class="pill bad">Off-site clock-in</span>':''}</div>
+        <div class="site" style="margin-top:6px">${esc(sh.site.name)}</div>
+        <div class="post">${esc(sh.pos.name)}</div>
+        <div class="time">${t12(sh.s)} – ${t12(sh.e)}</div>
+        <div class="meta">${sh.site.address?esc(sh.site.address)+' · ':''}${sh.site.phone?'<a href="tel:'+esc(sh.site.phone.replace(/[^\\d+]/g,''))+'">'+esc(sh.site.phone)+'</a>':''}${sh.clock.in?' · in '+fmtAt(sh.clock.in.at):''}${sh.clock.out?' · out '+fmtAt(sh.clock.out.at):''}</div>
+        ${sh.note?'<div class="msg info">'+esc(sh.note)+'</div>':''}
+        ${(sh.site.postOrders||sh.pos.memo)?`<details><summary>Post orders</summary><div class="orders">${esc(sh.site.postOrders||'')}${sh.pos.memo?'\n\n'+esc(sh.pos.memo):''}</div></details>`:''}
+        <div class="btns">
+          ${!sh.ack&&!sh.clock.in?`<button class="btn" data-ack="${sh.id}">Acknowledge</button>`:''}
+          ${canIn?`<button class="btn gold" data-clock="in" data-id="${sh.id}">Clock in</button>`:''}
+          ${canOut?`<button class="btn primary" data-clock="out" data-id="${sh.id}">Clock out</button>`:''}
+          ${sh.site.address?`<a class="btn small" style="text-align:center;text-decoration:none" href="https://maps.google.com/?q=${encodeURIComponent(sh.site.address)}" target="_blank" rel="noopener">Map</a>`:''}
+        </div></div>`;
+    }
+  }
+  $('#main').innerHTML=html;
+}
+const fmtAt=iso=>{const d=new Date(iso);return (d.getHours()%12||12)+':'+pad(d.getMinutes())+(d.getHours()<12?'am':'pm');};
+function addDays(ds,n){const d=parseLocal(ds);d.setDate(d.getDate()+n);return d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate());}
+
+document.body.addEventListener('click',async e=>{
+  const ack=e.target.closest('[data-ack]');if(ack){ack.disabled=true;try{await api('POST','/api/officer/shifts/'+ack.dataset.ack+'/ack');toast('Acknowledged');await load();}catch(err){toast(err.message);ack.disabled=false;}return;}
+  const ck=e.target.closest('[data-clock]');if(ck){ck.disabled=true;ck.textContent='Getting location…';
+    const pos=await new Promise(res=>{if(!navigator.geolocation)return res(null);navigator.geolocation.getCurrentPosition(p=>res(p.coords),()=>res(null),{enableHighAccuracy:true,timeout:12000,maximumAge:30000});});
+    try{const r=await api('POST','/api/officer/shifts/'+ck.dataset.id+'/clock',{kind:ck.dataset.clock,lat:pos?.latitude,lng:pos?.longitude,accuracy:pos?.accuracy});
+      toast(ck.dataset.clock==='in'?(r.flagged?'Clocked in — '+(r.note||'location flagged for dispatch'):'Clocked in. Have a safe shift.'):'Clocked out. Thanks.');await load();}
+    catch(err){toast(err.message);await load();}
+    return;}
+});
+if('serviceWorker' in navigator)navigator.serviceWorker.register('sw.js').catch(()=>{});
+start();
+</script>
+</body>
+</html>

@@ -1,0 +1,39 @@
+{
+  "port": 8080,
+  "baseUrl": "http://localhost:8080",
+  "timeZone": "America/New_York",
+  "dbFile": "data/guardpro.db",
+  "sessionDays": 30,
+  "devShowCodes": true,
+  "alertsEnabled": false,
+  "remindersEnabled": false,
+  "admin": {
+    "email": "brian@newenglandsecurity.com",
+    "password": "change-me-on-first-login",
+    "name": "Brian Brown"
+  },
+  "lateAfterMinutes": 10,
+  "missedAfterMinutes": 60,
+  "geofenceMeters": 250,
+  "reminders": {
+    "eveningBeforeHour": 18,
+    "hoursBefore": 2
+  },
+  "slack": {
+    "webhookUrl": ""
+  },
+  "email": {
+    "provider": "none",
+    "apiKey": "",
+    "from": "dispatch@newenglandsecurity.com",
+    "to": [
+      "brian@newenglandsecurity.com"
+    ]
+  },
+  "sms": {
+    "provider": "none",
+    "accountSid": "",
+    "authToken": "",
+    "from": ""
+  }
+}
