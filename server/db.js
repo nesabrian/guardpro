@@ -83,7 +83,7 @@ function siteDoc(r, positions) {
     address: r.address || '', lat: r.lat, lng: r.lng, radius: r.radius_m, postOrders: r.post_orders || '', source: r.source || '', positions };
 }
 function positionDoc(p, templates) {
-  return { id: p.id, name: p.name, customId: p.custom_id || '', armed: !!p.armed, active: !!p.active, memo: p.memo || '', begin: p.begin || '', end: p.end || '', templates };
+  return { id: p.id, name: p.name, customId: p.custom_id || '', armed: !!p.armed, active: !!p.active, memo: p.memo || '', begin: p.begin || '', end: p.end || '', routeId: p.route_id || null, loneMinutes: p.lone_minutes || 0, templates };
 }
 function templateDoc(t) {
   return { id: t.id, sd: t.sd, st: t.st, ed: t.ed, et: t.et, emp: t.emp, vacant: !!t.vacant, board: !!t.board, brk: t.brk || 0, begin: t.begin || '', end: t.end || '', every: t.every };

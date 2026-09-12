@@ -70,7 +70,7 @@ async function sendReminders() {
 function start() {
   // Both switches default OFF so a parallel run beside TrackTik does not alert on every shift
   // that was clocked in elsewhere. Turn them on in config.json once officers clock in here.
-  const tick = async () => { try { if (cfg.alertsEnabled) await checkLate(); if (cfg.remindersEnabled) await sendReminders(); } catch (e) { console.error('[jobs]', e); } };
+  const tick = async () => { try { if (cfg.alertsEnabled) await checkLate(); if (cfg.remindersEnabled) await sendReminders(); const p5 = require('./phase5'); if (p5.tick) await p5.tick(); } catch (e) { console.error('[jobs]', e); } };
   if (!cfg.alertsEnabled) console.log('[jobs] late/missed alerts are OFF (alertsEnabled: false)');
   if (!cfg.remindersEnabled) console.log('[jobs] shift reminders are OFF (remindersEnabled: false)');
   setTimeout(tick, 5000);

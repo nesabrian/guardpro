@@ -79,4 +79,4 @@ function createDispatchUser({ name, email, password, role }) {
 function setPassword(userId, password) { db.prepare('UPDATE users SET pass_hash=? WHERE id=?').run(hashPassword(password), userId); }
 function listUsers() { return db.prepare('SELECT id,role,name,email,phone,employee_id,created_at,last_login_at FROM users ORDER BY role,name').all(); }
 
-module.exports = { normPhone, loginPassword, requestCode, verifyCode, userFromToken, destroySession, publicUser, ensureAdmin, createDispatchUser, setPassword, listUsers };
+module.exports = { normPhone, loginPassword, requestCode, verifyCode, userFromToken, destroySession, publicUser, ensureAdmin, createDispatchUser, setPassword, listUsers, createSession };

@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Guard Pro · Client portal</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&family=Barlow:wght@400;500;600&display=swap">
+<style>
+:root{--navy:#0A1F44;--gold:#C9A227;--bg:#F3F4F7;--surface:#fff;--surface-2:#EBEEF4;--line:#D8DCE6;--text:#131C33;--muted:#5D6780;--ok:#2C7A5B;--ok-bg:#E3F2EA;--warn:#A86D0E;--warn-bg:#FBF1DC;--bad:#B3261E;--bad-bg:#FBE9E7;--info:#2B5FAF;--info-bg:#E4ECFA}
+@media (prefers-color-scheme:dark){:root{--bg:#0D1526;--surface:#142038;--surface-2:#1B2A48;--line:#26324D;--text:#E8ECF4;--muted:#9AA6BF;--ok:#7FD3AE;--ok-bg:#15352A;--warn:#E6B45A;--warn-bg:#3A2E14;--bad:#F28B82;--bad-bg:#3A1E1C;--info:#8FB4F0;--info-bg:#1A2B4D}}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font-family:Barlow,system-ui,sans-serif;font-size:15px;line-height:1.45}
+.top{background:var(--navy);color:#fff;padding:14px 20px;display:flex;align-items:center;gap:16px}.brand{font-family:"Barlow Condensed",sans-serif;font-weight:700;font-size:22px;letter-spacing:.06em;text-transform:uppercase}.brand b{color:var(--gold)}
+.top .who{margin-left:auto;font-size:13px;opacity:.85}.top button{background:none;border:0;color:#fff;text-decoration:underline;font:inherit;font-size:12px}
+main{max-width:1000px;margin:0 auto;padding:20px}
+h2{font-family:"Barlow Condensed",sans-serif;font-size:20px;letter-spacing:.05em;text-transform:uppercase;color:var(--muted);margin:24px 0 8px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:14px 16px;margin-bottom:12px}
+.card h3{font-family:"Barlow Condensed",sans-serif;font-size:20px;margin:0 0 2px}
+table{width:100%;border-collapse:collapse;font-variant-numeric:tabular-nums}th,td{text-align:left;padding:6px 8px;border-bottom:1px solid var(--line);font-size:14px}th{font-family:"Barlow Condensed",sans-serif;letter-spacing:.05em;text-transform:uppercase;color:var(--muted);font-size:13px}
+.pill{display:inline-block;font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;padding:2px 7px;border-radius:999px;background:var(--surface-2);color:var(--muted)}
+.pill.ok{background:var(--ok-bg);color:var(--ok)}.pill.warn{background:var(--warn-bg);color:var(--warn)}.pill.bad{background:var(--bad-bg);color:var(--bad)}.pill.info{background:var(--info-bg);color:var(--info)}
+.login{max-width:400px;margin:60px auto}.login h1{font-family:"Barlow Condensed",sans-serif;font-size:30px;margin:0 0 4px}.field{display:flex;flex-direction:column;gap:6px;margin:12px 0}.field input{font:inherit;font-size:17px;padding:10px;border:1px solid var(--line);border-radius:8px;background:var(--surface);color:var(--text)}
+.btn{border:1px solid var(--line);background:var(--surface);color:var(--text);border-radius:8px;padding:10px 14px;font:inherit;font-weight:600;cursor:pointer}.btn.primary{background:var(--navy);border-color:var(--navy);color:#fff}
+.msg{padding:10px 12px;border-radius:8px;margin:8px 0}.msg.bad{background:var(--bad-bg);color:var(--bad)}.msg.info{background:var(--info-bg);color:var(--info)}
+.rep{cursor:pointer}.rep:hover{background:var(--surface-2)}
+.detail{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:16px;margin-top:10px}.kv{display:grid;grid-template-columns:max-content 1fr;gap:4px 14px}.kv div:nth-child(odd){color:var(--muted)}.pre{white-space:pre-wrap}
+.photos{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}.photos img{width:140px;height:140px;object-fit:cover;border-radius:8px;border:1px solid var(--line)}
+.day{color:var(--muted);font-size:13px;letter-spacing:.05em;text-transform:uppercase}
+</style>
+</head>
+<body>
+<header class="top"><div class="brand">Guard <b>Pro</b></div><div style="font-size:14px;opacity:.85">Client portal</div><div class="who" id="who"></div></header>
+<main id="main"><div class="msg info">Loading…</div></main>
+<script>
+const $=s=>document.querySelector(s);const pad=n=>String(n).padStart(2,'0');
+const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const t12=s=>{const [h,mi]=s.slice(11,16).split(':').map(Number);return (h%12||12)+':'+pad(mi)+(h<12?'am':'pm')};
+const fmtAt=iso=>{if(!iso)return '';const d=new Date(iso);return `${d.getMonth()+1}/${d.getDate()} ${d.getHours()%12||12}:${pad(d.getMinutes())}${d.getHours()<12?'am':'pm'}`};
+async function api(m,p,b){const r=await fetch(p,{method:m,credentials:'same-origin',headers:{'content-type':'application/json'},body:b?JSON.stringify(b):undefined});const j=await r.json().catch(()=>({}));if(!r.ok)throw new Error(j.error||r.statusText);return j;}
+const S={user:null,email:''};
+async function start(){try{const me=await api('GET','/api/me');S.user=me.user;}catch(e){}if(!S.user)return login();if(S.user.role!=='client'){location.href=S.user.role==='officer'?'/officer/':'/dispatch/';return;}await overview();}
+function login(step){$('#who').innerHTML='';$('#main').innerHTML=`<div class="login"><h1>Client sign in</h1><p style="color:var(--muted)">${step==='code'?'We emailed a 6-digit code to '+esc(S.email)+'.':'Enter the email address your security company set up for you.'}</p><form id="lf">${step==='code'?'<div class="field"><label>Code</label><input name="code" inputmode="numeric" maxlength="6" required autofocus></div>':'<div class="field"><label>Email</label><input name="email" type="email" required autofocus></div>'}<div class="msg bad" id="lmsg" hidden></div><button class="btn primary" type="submit" style="width:100%">${step==='code'?'Sign in':'Email me a code'}</button></form></div>`;
+  $('#lf').addEventListener('submit',async e=>{e.preventDefault();const f=e.target,m=$('#lmsg');m.hidden=true;try{if(step==='code'){await api('POST','/api/client/verify',{email:S.email,code:f.code.value.trim()});await start();}else{S.email=f.email.value.trim();const r=await api('POST','/api/client/request-code',{email:S.email});login('code');if(r.devCode){const d=document.createElement('div');d.className='msg info';d.textContent='Email is not configured on this server yet. Your code is '+r.devCode;$('#lf').prepend(d);}}}catch(err){m.textContent=err.message;m.hidden=false;}});}
+async function overview(){
+  let d;try{d=await api('GET','/api/client/overview');}catch(e){$('#main').innerHTML='<div class="msg bad">'+esc(e.message)+'</div>';return;}
+  $('#who').innerHTML=`${esc(d.client.name)} · <button id="out">Sign out</button>`;$('#out').onclick=async()=>{await api('POST','/api/auth/logout');location.reload();};
+  const st={on_post:['ok','On post'],done:['','Done'],due:['bad','Not clocked in'],no_show:['bad','No clock-in'],upcoming:['info','Scheduled'],open:['warn','Unfilled']};
+  const today=d.now.slice(0,10);
+  $('#main').innerHTML=`<h2>Coverage · yesterday through next week</h2>${d.sites.map(s=>`<div class="card"><h3>${esc(s.name)}</h3><div style="color:var(--muted);font-size:13px">${esc(s.address||'')}</div>
+    <table><tr><th>Date</th><th>Post</th><th>Time</th><th>Officer</th><th>Status</th><th>Clock in / out</th><th>Checkpoint scans</th></tr>${s.shifts.map(sh=>`<tr style="${sh.s.slice(0,10)===today?'background:var(--surface-2)':''}"><td>${sh.s.slice(5,10)}</td><td>${esc(sh.post)}</td><td>${t12(sh.s)}–${t12(sh.e)}</td><td>${esc(sh.officer||'—')}</td><td><span class="pill ${st[sh.state][0]}">${st[sh.state][1]}</span></td><td>${sh.clockIn?fmtAt(sh.clockIn):''}${sh.clockOut?' / '+fmtAt(sh.clockOut):''}</td><td>${sh.scans||''}</td></tr>`).join('')||'<tr><td colspan="7" style="color:var(--muted)">No shifts scheduled.</td></tr>'}</table></div>`).join('')||'<div class="msg info">No sites are linked to your login yet.</div>'}
+  <h2>Reports</h2><div class="card"><table><tr><th>When</th><th>Site</th><th>Type</th><th>Title</th><th>Officer</th></tr>${d.reports.map(r=>`<tr class="rep" data-rep="${r.id}"><td>${fmtAt(r.at)}</td><td>${esc(r.site)}</td><td><span class="pill ${r.kind==='incident'?'bad':r.kind==='patrol'?'info':''}">${r.kind}</span></td><td>${esc(r.title)}${r.photos.length?' 📷'+r.photos.length:''}</td><td>${esc(r.employee)}</td></tr>`).join('')||'<tr><td colspan="5" style="color:var(--muted)">No reports yet.</td></tr>'}</table><div id="repdetail"></div></div>`;
+  document.querySelectorAll('.rep').forEach(tr=>tr.onclick=async()=>{try{const r=await api('GET','/api/client/reports/'+tr.dataset.rep);$('#repdetail').innerHTML=`<div class="detail"><h3 style="margin:0 0 6px;font-family:'Barlow Condensed',sans-serif">${esc(r.title)}</h3><div style="color:var(--muted);font-size:13px;margin-bottom:8px">${esc(r.site)} · ${esc(r.employee)} · ${fmtAt(r.at)}</div><div class="kv">${Object.entries(r.fields).map(([k,v])=>`<div>${esc(k)}</div><div class="pre">${esc(v)}</div>`).join('')}</div>${r.photos.length?`<div class="photos">${r.photos.map(id=>`<a href="/api/photos/${id}" target="_blank"><img src="/api/photos/${id}" alt=""></a>`).join('')}</div>`:''}</div>`;$('#repdetail').scrollIntoView({behavior:'smooth'});}catch(e){alert(e.message);}});
+}
+start();
+</script>
+</body>
+</html>

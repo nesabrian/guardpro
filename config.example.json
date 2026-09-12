@@ -35,5 +35,13 @@
     "accountSid": "",
     "authToken": "",
     "from": ""
-  }
+  },
+  "company": "New England Security",
+  "companyAddress": "",
+  "defaultBillRate": 32,
+  "defaultPayRate": 20,
+  "overtimeWeeklyHours": 40,
+  "roundClockToMinutes": 15,
+  "invoiceTermsDays": 30,
+  "loneGraceMinutes": 5
 }
