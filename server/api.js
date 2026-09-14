@@ -99,6 +99,7 @@ require('./phase2')(shared);
 require('./phase3')(shared);
 require('./phase4')(shared);
 require('./phase5')(shared);
+require('./dashboard')(shared);
 
 async function handle(req, ctx) { return R.dispatch(req, ctx); }
 module.exports = { handle, bus };

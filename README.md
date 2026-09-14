@@ -5,8 +5,8 @@ phases are in this codebase.
 
 Three apps, one server, no packages to install (Node.js 22.5 or newer with its built-in SQLite):
 
-- **Dispatch board** at `/dispatch/` — week grid by site or officer, live "On post" view, open-shift board,
-  officer requests, reports, officers, sites and posts (with checkpoints, tours and patrol settings),
+- **Dispatch board** at `/dispatch/` — dashboard (KPI tiles, needs-attention list, live activity feed), week grid by site or officer, live "On post" view, open-shift board,
+  officer requests, reports, dispatcher clock-in/out on an officer's behalf, officers, sites and posts (with checkpoints, tours and patrol settings),
   pay & bill (timesheets, invoices, aging, rates and holidays), patrol routes and runsheets.
 - **Officer app** at `/officer/` — a mobile web app officers add to their home screen: my shifts,
   acknowledge, clock in and out with location, post orders, open shifts and pickup requests, drop and swap
@@ -80,9 +80,9 @@ to PostgreSQL unchanged apart from the driver.
 ## Layout
 
 ```
-server/   index.js (http + static), router.js, api.js (core routes), phase2–5.js, db.js (schema + documents),
+server/   index.js (http + static), router.js, api.js (core routes), phase2–5.js, dashboard.js, db.js (schema + documents),
           auth.js (logins), jobs.js (alerts + reminders), notify.js (Slack/email/SMS), time.js, import-tracktik.js
-web/      dispatch/{index.html, phases.js}, officer/{index.html, manifest.webmanifest, sw.js, icon.svg}, client/index.html
+web/      dispatch/{index.html, phases.js, dash.js}, officer/{index.html, manifest.webmanifest, sw.js, icon.svg}, client/index.html
 scripts/  smoke-test.js, phases-test.js
 data/     guardpro.db, uploads/ (photos), import/ (TrackTik snapshot; not committed)
 ```

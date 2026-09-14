@@ -123,7 +123,9 @@
   /* ---------- panels ---------- */
   const _renderPanel = renderPanel; renderPanel = function () {
     const sel = S.sel; const p = $('#panel');
-    if (sel && ['report', 'ts', 'invoice', 'rate', 'route', 'runsheet'].includes(sel.type)) { p.className = 'panel'; p.innerHTML = '<div class="panel-in"><div class="loading">Loading…</div></div>'; renderPhasePanel(sel).then(html => { if (S.sel === sel) p.innerHTML = html; }).catch(e => { p.innerHTML = `<div class="panel-in"><div class="note bad">${esc(e.message)}</div></div>`; }); return; }
+    // Do not wipe an editor while someone is typing in it (background refreshes call render too).
+    const ae = document.activeElement; if (sel && ['route', 'rate', 'invoice', 'ts', 'site'].includes(sel.type) && ae && p.contains(ae) && (ae.tagName === 'TEXTAREA' || (ae.tagName === 'INPUT' && !['checkbox', 'radio'].includes(ae.type)))) return;
+    if (sel && ['report', 'ts', 'invoice', 'rate', 'route', 'runsheet'].includes(sel.type)) { p.className = 'panel'; const keep = ['route', 'rate'].includes(sel.type); if (!keep) p.innerHTML = '<div class="panel-in"><div class="loading">Loading…</div></div>'; renderPhasePanel(sel).then(html => { if (S.sel === sel) p.innerHTML = html; }).catch(e => { p.innerHTML = `<div class="panel-in"><div class="note bad">${esc(e.message)}</div></div>`; }); return; }
     _renderPanel();
     if (sel && sel.type === 'site' && !sel.isNew) appendSiteSetup(sel);
   };
@@ -171,9 +173,9 @@
       <div class="actions"><button class="btn primary" data-act2="rate-save">Save rate</button>${sel.id !== 'new' ? '<button class="btn danger" data-act2="rate-del">Delete</button>' : ''}<button class="btn" data-act="cancel">Close</button></div></div>`;
     }
     if (sel.type === 'route') {
-      const r = sel.id === 'new' ? { name: '', vehicle: '', stops: [], active: true, notes: '' } : P.patrol.routes.find(x => x.id === sel.id); sel.draft = sel.draft || JSON.parse(JSON.stringify(r));
+      const r = sel.id === 'new' ? { name: '', vehicle: '', stops: [], active: true, notes: '' } : P.patrol.routes.find(x => x.id === sel.id); sel.draft = sel.draft || JSON.parse(JSON.stringify(r)); if (sel.id === 'new') P.routeDraft = sel.draft;
       const d = sel.draft; const siteOpts = sitesSorted().map(s => `<option value="${s.id}">${esc(s.name)}</option>`).join('');
-      return `<div class="panel-in"><div class="kicker">${sel.id === 'new' ? 'New route' : 'Route'}</div><h2>${esc(d.name || 'Patrol route')}</h2>
+      return `<div class="panel-in"><div class="kicker">${sel.id === 'new' ? 'New route' : 'Route'}</div><h2>${esc(d.name || 'Patrol route')}</h2>${sel.error ? `<div class="note bad">${esc(sel.error)}</div>` : ''}<div class="small muted">A runsheet is created automatically for every shift on a post that uses this route. Assign the route to a post under Sites &amp; posts.</div>
       <div class="row2"><div class="field"><label>Route name</label><input data-f2="route-name" value="${esc(d.name)}" placeholder="North Shore night run"></div><div class="field"><label>Vehicle</label><input data-f2="route-vehicle" value="${esc(d.vehicle)}" placeholder="Patrol 3"></div></div>
       <label class="chk"><input type="checkbox" data-f2="route-active" ${d.active ? 'checked' : ''}> Active</label>
       <h3>Stops in order</h3><div class="stops">${d.stops.map((s, i) => `<div class="stop"><div style="display:flex;gap:6px;align-items:center"><b style="flex:0 0 22px">${i + 1}.</b><select data-stop="siteId|${i}" style="flex:1;min-width:0"><option value="">Site…</option>${siteOpts.replace(`value="${s.siteId}"`, `value="${s.siteId}" selected`)}</select><button class="linkbtn" data-act2="stop-up" data-i="${i}">↑</button><button class="linkbtn" data-act2="stop-del" data-i="${i}">×</button></div>
@@ -255,11 +257,11 @@
       else if (a === 'rate-del') { if (!confirm('Delete this rate?')) return; await API.send('DELETE', '/api/rates/' + sel.id); S.sel = null; loadRates(); render(); }
       else if (a === 'hol-add') { const date = $('#hol-date').value, name = $('#hol-name').value; if (!date) return toast('Pick a date'); await API.send('PUT', '/api/holidays', { holidays: [...P.rates.holidays, { date, name }] }); loadRates(); }
       else if (a === 'hol-del') { await API.send('PUT', '/api/holidays', { holidays: P.rates.holidays.filter(h => h.date !== b.dataset.date) }); loadRates(); }
-      else if (a === 'route-new') { S.sel = { type: 'route', id: 'new' }; render(); }
+      else if (a === 'route-new') { S.sel = { type: 'route', id: 'new', draft: P.routeDraft || undefined }; if (P.routeDraft) toast('Restored the route you were editing'); render(); }
       else if (a === 'stop-add') { sel.draft.stops.push({ siteId: '', windowFrom: '', windowTo: '', visits: 1, instructions: '' }); render(); }
       else if (a === 'stop-del') { sel.draft.stops.splice(+b.dataset.i, 1); render(); }
       else if (a === 'stop-up') { const i = +b.dataset.i; if (i > 0) { const s = sel.draft.stops.splice(i, 1)[0]; sel.draft.stops.splice(i - 1, 0, s); render(); } }
-      else if (a === 'route-save') { const d = sel.draft; if (!d.name) return toast('Name the route'); if (!d.stops.length || d.stops.some(s => !s.siteId)) return toast('Every stop needs a site'); await API.send('PUT', '/api/routes/' + sel.id, d); toast('Route saved'); S.sel = null; loadPatrol(); render(); }
+      else if (a === 'route-save') { const d = sel.draft; sel.error = !d.name ? 'Give the route a name.' : !d.stops.length ? 'Add at least one stop.' : d.stops.some(s => !s.siteId) ? 'Every stop needs a site.' : ''; if (sel.error) { render(); return; } await API.send('PUT', '/api/routes/' + sel.id, d); P.routeDraft = null; toast('Route saved'); S.sel = null; loadPatrol(); render(); }
       else if (a === 'route-del') { if (!confirm('Delete this route? Posts using it lose their runsheets.')) return; await API.send('DELETE', '/api/routes/' + sel.id); S.sel = null; loadPatrol(); render(); }
       else if (a === 'cp-add') { const c = P.cp[String(sel.id)]; c.checkpoints.push({ name: 'Checkpoint ' + (c.checkpoints.length + 1), code: '', instructions: '' }); c.dirty = true; renderSiteSetup(String(sel.id)); }
       else if (a === 'cp-del') { const c = P.cp[String(sel.id)]; c.checkpoints.splice(+b.dataset.i, 1); c.dirty = true; renderSiteSetup(String(sel.id)); }
